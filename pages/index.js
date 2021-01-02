@@ -1,11 +1,87 @@
 import Head from 'next/head'
 import Navbar from '../components/navbar';
+import React from 'react';
+import PropTypes from 'prop-types';
+import axios from 'axios';
+import csvjson from 'csvjson';
+import { CsvToHtmlTable } from 'react-csv-to-table';
 
-export default function Home() {
-  return (
-    <div className=" font-sans leading-normal tracking-normal">
+
+class Home extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {data:'',datacsv:undefined};
+  }
+handleChange=(ev)=>{
+this.setState({data:ev.target.value});
+};
+
+uploadFile=(event)=> {
+  var that=this;
+
+  let file = event.target.files[0];
+  console.log(file);
+  let filereader=new FileReader();
+  filereader.onload = function(event) {
+    // The file's text will be printed here
+    let data=event.target.result;
+    var options = {
+      headers:'key'
+   }
+    const CSVOut=csvjson.toCSV(data, options);
+    console.log(CSVOut);
+    that.setState({datacsv:CSVOut});
+
+      var dataBlob = new Blob([CSVOut], {type: 'text/csv'});
+
+      let url = window.URL.createObjectURL(dataBlob);
+      let a = document.createElement('a');
+      a.href = url;
+      a.download = "CSVOut.csv";
+      a.click();
+
+  };    
+  filereader.readAsText(file);
+
+
+  
+
+
+}
+
+handleClick=(e)=>{
+  var options = {
+    headers:'key'
+ }
+  const CSVOut=csvjson.toCSV(this.state.data, options);
+  console.log(CSVOut);
+this.setState({datacsv:CSVOut});
+
+  var data = new Blob([CSVOut], {type: 'text/csv'});
+
+  let req={"jsonInp":JSON.stringify(this.state.data)};
+
+
+
+// //   
+  
+     let url = window.URL.createObjectURL(data);
+     let a = document.createElement('a');
+     a.href = url;
+     a.download = "a.csv";
+     a.click();
+     
+
+
+//});
+
+
+}
+  render() {
+    return (
+      <div className=" font-sans leading-normal tracking-normal">
       <Head>
-        <title>Create Next App</title>
+        <title>Fast and free JSON to CSV Converter Online </title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Navbar />
@@ -14,9 +90,12 @@ export default function Home() {
   <input type="text" placeholder="Copy Paste JSON Here" class="px-12 py-12 placeholder-gray-400 text-gray-700 relative bg-white bg-white rounded text-base border border-gray-400 outline-none focus:outline-none focus:shadow-outline w-full"/>
 </div> */}
         <h1 className="text-grey-darkest">Convert JSON to CSV Online </h1>
-        <p>Upload or Copy paste the JSON in the etxt box below , this will convert your JSON to CSV and CSV will get downloaded .</p>
+        <p>
+      How to Convert JSON to CSV ? Copy  your JSON and paste  below or upload as a file . Your data is never sent to our servers. Please report bugs and send feedback on < a href="https://github.com/Sanjay007">GitHub</a>. 
+      </p>
+      <p>    Upload or Copy paste the JSON in the text box below , this will convert your JSON to CSV and CSV will get downloaded . You will also be able to view the CSV in tabular format once converted.</p>
 
-        <div class="w-full">
+           <div class="w-full">
 
 
 
@@ -31,7 +110,7 @@ export default function Home() {
               <div class="mx-3 relative border-dotted h-32 rounded-lg border-dashed border-2 border-black-700 bg-gray-100 flex justify-center items-center">
                 <div class="absolute">
                   <div class="flex flex-col items-center"> <i class="fa fa-folder-open fa-3x text-blue-700"></i> <span class="block text-gray-400 font-normal">Upload JSON File</span> </div>
-                </div> <input type="file" class="h-full w-full opacity-0" name="" />
+                </div> <input type="file"  name="myFile" onChange={this.uploadFile}  class="h-full w-full opacity-0" name="" />
               </div>
 
             </div>
@@ -41,12 +120,12 @@ export default function Home() {
 
                 <div class="box border rounded flex flex-col shadow bg-white">
                   <div class="box__title bg-grey-lighter px-3 py-2 border-b"><h3 class="text-sm text-grey-darker font-medium">JSON to CSV</h3></div>
-                  <textarea class="text-grey-darkest placeholder-gray-400 flex-1 p-2 m-1 bg-transparent text-gray-700 relative bg-white bg-white rounded text-base border border-gray-400 outline-none focus:outline-none focus:shadow-outline py-9" cols="9" name="tt" placeholder="Copy Paste JSON Here"></textarea>
+                  <textarea class="text-grey-darkest placeholder-gray-400 flex-1 p-2 m-1 bg-transparent text-gray-700 relative bg-white bg-white rounded text-base border border-gray-400 outline-none focus:outline-none focus:shadow-outline py-9" cols="9" name="tt" placeholder="Copy Paste JSON Here" onChange={this.handleChange} ></textarea>
 
 
 
                 </div>
-                <button class="mr-5  text-center bg-gray-200 hover:bg-gray-300 border border-gray-400 text-black font-bold py-2 px-6 rounded-md">
+                <button onClick={this.handleClick} class="mr-5  text-center bg-gray-200 hover:bg-gray-300 border border-gray-400 text-black font-bold py-2 px-6 rounded-md">
                   Convert
 </button>
               </div>
@@ -55,7 +134,18 @@ export default function Home() {
           </div>
         </div>
 
+<div className="flex pt-7">
+  
+  {this.state.datacsv!=undefined?
+ <div>
+    <h2>Json to CSV Converted Results In table </h2>
+<CsvToHtmlTable
+  data={this.state.datacsv}
+  csvDelimiter=","
+  tableClassName="rtable"
+/></div>:''}
 
+</div>
 
 
 
@@ -63,17 +153,15 @@ export default function Home() {
       </main>
 
       <footer>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className="logo" />
-        </a>
+       copyright@2020 
+       <a href="">
+       json-to-csv-online
+         </a>
       </footer>
 
       <style jsx>{`
+
+      
         .container {
           min-height: 100vh;
           padding: 0 0.5rem;
@@ -219,5 +307,10 @@ export default function Home() {
         }
       `}</style>
     </div>
-  )
+    );
+  }
 }
+
+Home.propTypes = {};
+
+export default Home;
