@@ -81,8 +81,13 @@ this.setState({datacsv:CSVOut});
     return (
       <div className=" font-sans leading-normal tracking-normal">
       <Head>
-        <title>Fast and free JSON to CSV Converter Online </title>
+        <title>JSON to CSV Converter Online  </title>
         <link rel="icon" href="/favicon.ico" />
+      <meta name="description" content="JSON to CSV Converter online tool helps you to convert JSON to CSV free . Upload your JSON or paste the JSON directly and You will get CSV in Table as well as downloaded ." /> 
+     <meta name="robots" content="index, follow" />
+     <link rel="canonical" href="https://json-to-csv.online " />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <meta name="google-site-verification" content="ftgNSeKjZKkPnBS7m6eind-buZUcow51pdF-HJwL5vE" />
       </Head>
       <Navbar />
       <main>
